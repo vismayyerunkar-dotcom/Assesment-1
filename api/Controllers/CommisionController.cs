@@ -1,3 +1,6 @@
+using AvalphaTechnologies.CommissionCalculator.Dtos.Requests;
+using AvalphaTechnologies.CommissionCalculator.Dtos.Responses;
+using AvalphaTechnologies.CommissionCalculator.Services.CommissionService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AvalphaTechnologies.CommissionCalculator.Controllers
@@ -6,28 +9,36 @@ namespace AvalphaTechnologies.CommissionCalculator.Controllers
     [Route("[controller]")]
     public class CommisionController : ControllerBase
     {
-        [ProducesResponseType(typeof(CommissionCalculationResponse), 200)]
-        [HttpPost]
-        public IActionResult Calculate(CommissionCalculationRequest calculationRequest)
+        private readonly ICommissionCalculationService _commissionCalculationService;
+
+        public CommisionController(
+            ICommissionCalculationService commissionCalculationService)
         {
-            return Ok(new CommissionCalculationResponse() { 
-                AvalphaTechnologiesCommissionAmount = 999,
-                CompetitorCommissionAmount = 100
-            });
+            _commissionCalculationService = commissionCalculationService;
+        }
+
+        [HttpPost("calculate")]
+        [ProducesResponseType(typeof(CommissionCalculationResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Calculate(
+            [FromBody] CommissionCalculationRequestDto calculationRequest)
+        {
+            if (calculationRequest == null)
+                return BadRequest("Request body cannot be null");
+
+            var result = _commissionCalculationService.Calculate(
+                calculationRequest.LocalSalesCount,
+                calculationRequest.ForeignSalesCount,
+                calculationRequest.AverageSaleAmount);
+
+            var response = new CommissionCalculationResponseDto
+            {
+                AvalphaTechnologiesCommissionAmount = result.AvalphaCommission,
+                CompetitorCommissionAmount = result.CompetitorsCommission
+            };
+
+            return Ok(response);
         }
     }
-
-    public class CommissionCalculationRequest
-    {
-        public int LocalSalesCount { get; set; }
-        public int ForeignSalesCount { get; set; }
-        public decimal AverageSaleAmount { get; set; }
-    }
-
-    public class CommissionCalculationResponse
-    {
-        public decimal AvalphaTechnologiesCommissionAmount { get; set; }
-
-        public decimal CompetitorCommissionAmount { get; set; }
-    }
 }
+
