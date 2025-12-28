@@ -83,3 +83,24 @@ Total = £95.5
 - **Frontend:** React (Vite/CRA), TypeScript preferred (if scaffolded), Fetch/Axios OK  
 - **Backend:** .NET (C#), minimal API or MVC controller  
 - **Tests:** xUnit/NUnit + React Testing Library / Vitest/Jest  
+
+
+---
+
+✅ Notes on My Implementation
+
+Connected the React UI to the .NET backend using a small API layer to keep network logic out of components.
+
+Implemented commission calculation in the backend using the Strategy pattern so new commission rules can be added without changing existing logic.
+
+Added validation on both frontend and backend to prevent negative or invalid inputs.
+
+Used a custom React hook to handle API calls, loading state, and avoid duplicate requests.
+
+Wrote focused tests:
+
+Backend tests cover calculation logic and edge cases.
+
+Frontend tests focus on rendering, user interaction, and validation (business logic is tested outside the UI).
+
+Kept the solution simple and production-ready within the timebox, prioritizing clarity and extensibility over over-engineering.
